@@ -1,24 +1,35 @@
-# Logs
-logs
+# Node.js / Vite
+node_modules/
+dist/
+dist-ssr/
+*.tsbuildinfo
+.vite/
+
+# Python
+.venv/
+venv/
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.coverage
+htmlcov/
+
+# IDE and OS
+.vscode/
+.idea/
+.vs/
+.DS_Store
+Thumbs.db
+*.swp
+
+# Environment and local data
+.env
+.env.local
+.env.*.local
 *.log
 npm-debug.log*
-yarn-debug.log*
-yarn-error.log*
-pnpm-debug.log*
-lerna-debug.log*
 
-node_modules
-dist
-dist-ssr
-*.local
-
-# Editor directories and files
-.vscode/*
-!.vscode/extensions.json
-.idea
-.DS_Store
-*.suo
-*.ntvs*
-*.njsproj
-*.sln
-*.sw?
+# Generated outputs
+additional/generated_csv/

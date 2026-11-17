@@ -1,75 +1,153 @@
-# React + TypeScript + Vite
+# Коректор вимірювань
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+Вебзастосунок для аналізу та компенсації похибок цифрових вимірювань на основі еталонних даних. STEM-проєкт із дисципліни «Розробник фронтенду програмних систем».
 
-Currently, two official plugins are available:
+**Автор:** Тимур Лєтов, Київський національний університет імені Тараса Шевченка.
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+Програма може використовуватися для показників термометрів, електронних ваг, вимірювачів довжини та інших числових величин. Фронтенд побудований на React і TypeScript, обчислення виконуються окремим Python API.
 
-## React Compiler
+## Можливості
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+- Навчальний набір **TRAINING**: виміряне значення `FROM` та відповідне еталонне значення `TO`.
+- Робочий набір **DATA**: нові значення `FROM`, для яких після запуску обчислюється скориговане `TO`.
+- Ручне редагування таблиць та імпорт **CSV, TSV, XLSX** з вибором стовпців і способом додавання записів.
+- Методи корекції: **Авто**, **Пряма**, **Ламана**, **RBF-крива**, **Ковзне вікно**, **Експоненціальна**.
+- Інтерактивні SVG-графіки TRAINING і DATA, масштабування, переміщення, налаштування сітки, ліній та підписів.
+- Аналітика навчального набору: MAE, RMSE, максимальне відхилення та діапазони вимірювань.
+- Автоматичне збереження однієї поточної роботи у браузері; експорт/відкриття проєкту у **JSON**, експорт даних у **CSV** та графіків у **PNG**.
+- Адаптивний інтерфейс для вузьких екранів.
 
-## Expanding the ESLint configuration
+## Вимоги
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+- **Node.js** та **npm** для запуску фронтенду (сумісні з установленою версією Vite).
+- **Python 3.9** або сумісна версія Python для API.
+- Веббраузер із підтримкою сучасного JavaScript.
 
-```js
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
+Наведені нижче команди розраховані на **Windows PowerShell**. Відкривайте два окремі термінали: для фронтенду та для сервера.
 
-      // Remove tseslint.configs.recommended and replace with this
-      tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      tseslint.configs.stylisticTypeChecked,
+## Швидкий запуск із нуля
 
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+### 1. Отримати код
 
+Клонуйте репозиторій або відкрийте папку проєкту, якщо файли вже скопійовано:
+
+```powershell
+git clone https://github.com/Nakovalnikov/stem-front.git
+cd stem-front
 ```
 
-You can also install [eslint-plugin-react-x](https://npmx.dev/package/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://npmx.dev/package/eslint-plugin-react-dom) for React-specific lint rules:
+Якщо ви працюєте з локальною папкою `stem-measurement`, просто відкрийте її в терміналі замість клонування.
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
+### 2. Запустити Python API (перший термінал)
 
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+З кореня проєкту:
 
+```powershell
+cd backend
+py -3.9 -m venv .venv
+.\.venv\Scripts\python.exe -m pip install -r requirements.txt
+.\.venv\Scripts\python.exe -m uvicorn app.main:app --reload --port 8000
 ```
+
+Після першого встановлення залежностей надалі достатньо останньої команди (з каталогу `backend`).
+
+Перевірка сервера: http://127.0.0.1:8000/api/health — очікується відповідь `{"status":"ok"}`.
+
+### 3. Запустити фронтенд (другий термінал)
+
+Поверніться до кореня проєкту, де розташовано `package.json`:
+
+```powershell
+npm install
+npm run dev
+```
+
+Відкрийте адресу http://localhost:5173/ у браузері. У подальшому достатньо команди `npm run dev`.
+
+**Важливо:** сам по собі Vite не виконує математичних обчислень. Для кнопки «Запустити модель» Python API має працювати одночасно з фронтендом.
+
+## Як користуватися
+
+1. На головній сторінці натисніть **«Розпочати роботу»** та створіть нову роботу, продовжте збережену або відкрийте файл JSON.
+2. На вкладці **TRAINING** введіть не менше двох пар `FROM → TO` з різними значеннями `FROM`, або імпортуйте навчальний файл.
+3. На вкладці **DATA** введіть показання `FROM`, які потрібно скоригувати.
+4. У правій панелі виберіть метод (або **«Авто»**) і натисніть **«Запустити модель»**.
+5. Перегляньте скориговані `TO`, графік та аналітику. У меню **«Файл»** можна зберегти CSV, обидва графіки PNG чи весь проєкт JSON.
+
+Коротка інструкція також доступна **безпосередньо на сайті** за посиланням **«Посібник»** або кнопкою **«?»**. Докладніший User Guide входить до пояснювальної записки STEM-проєкту.
+
+## Структура проєкту
+
+```text
+src/
+  pages/                Сторінки: головна, початок, робоча область, посібник
+  components/           Таблиці, графік, аналітика, меню та діалогові вікна
+  hooks/useProject.ts   Стан поточного проєкту
+  domain/               Типи, обробка та імпорт даних, локальне збереження
+  api/modelApi.ts       Запити до Python API
+  index.css             Додаткові стилі та кольори графіків
+  vendor/               Локальна копія стилів Bootstrap і ліцензія
+backend/
+  app/main.py           HTTP API
+  app/models.py         Математичні методи корекції
+  app/schemas.py        Схеми вхідних даних
+  tests/                Тести серверної частини
+```
+
+**Технології:** React 19, TypeScript, Vite, React Router, Bootstrap, SVG, ExcelJS; Python, FastAPI, Pydantic, Uvicorn. Основні обчислення виконуються на сервері; браузер відповідає за введення, візуалізацію й експорт.
+
+## Збірка та перевірка
+
+У корені проєкту:
+
+```powershell
+npm run build
+npm run lint
+```
+
+Для тестів API (у каталозі `backend`; тестові інструменти встановлюються окремо):
+
+```powershell
+.\.venv\Scripts\python.exe -m pip install pytest httpx
+.\.venv\Scripts\python.exe -m pytest tests -q
+```
+
+Тести перевіряють HTTP-контракт і основні сценарії математичних методів. Метрики похибки в інтерфейсі обчислюються за **навчальним набором** і не є оцінкою на незалежній тестовій вибірці.
+
+## API
+
+- `GET /api/health` — перевірка доступності сервера.
+- `POST /api/run` — побудова моделі за TRAINING і корекція значень DATA.
+- `GET /api/model/export` — експорт параметрів останньої моделі, обчисленої сервером.
+
+Типово фронтенд звертається до API за адресою `http://<адреса-хоста>:8000`. За потреби можна задати `VITE_API_URL` у файлі `.env.local` в корені проєкту, наприклад:
+
+```dotenv
+VITE_API_URL=http://127.0.0.1:8000
+```
+
+Файл з параметрами моделі не замінює експорт проєкту JSON. Імпорт готових математичних моделей у застосунок наразі не передбачено.
+
+## Робота з телефона в локальній мережі
+
+На комп’ютері запустіть фронтенд і сервер із доступом по локальній мережі:
+
+```powershell
+npm run dev -- --host 0.0.0.0
+```
+
+У другому терміналі, у каталозі `backend`:
+
+```powershell
+.\.venv\Scripts\python.exe -m uvicorn app.main:app --host 0.0.0.0 --port 8000
+```
+
+Відкрийте з телефона `http://<IPv4-комп’ютера>:5173/`. Телефон і комп’ютер мають бути в одній локальній мережі; іноді потрібно дозволити порти у Windows Firewall. Відкриття сервера для всієї мережі призначене лише для довіреного локального середовища.
+
+## Збереження та зауваження
+
+- Поточний проєкт зберігається у **localStorage** цього браузера. Очищення даних браузера може його видалити; для резервної копії експортуйте **JSON**.
+- Після перезавантаження сторінки проєкт відновлюється, але для відновлення розрахованих `TO` та аналітики потрібно ще раз запустити модель.
+- Формати **CSV, TSV, XLSX** підтримуються для імпорту, а основний табличний експорт виконується у **CSV**.
+- Для надійної корекції даних бажано, щоб робочі `FROM` перебували в діапазоні навчальних точок. Поза цим діапазоном виконується екстраполяція, про що застосунок може попередити.
+
